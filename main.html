@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageConvert Pro - Бесплатный конвертер изображений</title>
+    <meta name="description" content="Конвертируйте изображения между JPEG, PNG, WebP форматами онлайн бесплатно">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .converter-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(45deg, #f8f9ff, #ffffff);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #764ba2;
+            background: linear-gradient(45deg, #f0f2ff, #f8f9ff);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .format-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .format-option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .format-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .format-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .convert-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .preview-container {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 50px;
+            padding: 20px 0;
+        }
+
+        .ads-placeholder {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: #666;
+            border: 2px dashed #ddd;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .converter-card { padding: 20px; }
+            .upload-area { padding: 40px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-image"></i> ImageConvert Pro</h1>
+            <p class="subtitle">Конвертируйте изображения между форматами быстро и бесплатно</p>
+        </header>
+
+        <div class="ads-placeholder">
+            <i class="fas fa-ad"></i> Место для рекламы Google AdSense
+        </div>
+
+        <div class="converter-card">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">Перетащите изображение или нажмите для выбора</div>
+                <div class="upload-subtext">Поддерживаются: JPEG, PNG, WebP, GIF, BMP (до 10 МБ)</div>
+            </div>
+
+            <input type="file" id="fileInput" class="file-input" accept="image/*">
+
+            <div class="format-selector" id="formatSelector" style="display: none;">
+                <h3 style="grid-column: 1 / -1; text-align: center; margin-bottom: 10px;">Выберите формат для конвертации:</h3>
+                <div class="format-option" data-format="jpeg">
+                    <i class="fas fa-file-image"></i>
+                    <div>JPEG</div>
+                </div>
+                <div class="format-option" data-format="png">
+                    <i class="fas fa-file-image"></i>
+                    <div>PNG</div>
+                </div>
+                <div class="format-option" data-format="webp">
+                    <i class="fas fa-file-image"></i>
+                    <div>WebP</div>
+                </div>
+            </div>
+
+            <button class="convert-btn" id="convertBtn" style="display: none;" disabled>
+                <i class="fas fa-exchange-alt"></i> Конвертировать
+            </button>
+
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner"></i> Конвертирование...
+            </div>
+
+            <div class="preview-container" id="previewContainer">
+                <h3>Результат:</h3>
+                <img id="previewImage" class="preview-image" alt="Конвертированное изображение">
+                <br>
+                <a id="downloadBtn" class="download-btn" download>
+                    <i class="fas fa-download"></i> Скачать
+                </a>
+            </div>
+        </div>
+
+        <div class="ads-placeholder">
+            <i class="fas fa-ad"></i> Место для рекламы
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="feature-title">Быстрая конвертация</div>
+                <div>Конвертируйте изображения мгновенно без загрузки на сервер</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-title">Безопасность</div>
+                <div>Ваши файлы обрабатываются локально в браузере</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="feature-title">Адаптивный дизайн</div>
+                <div>Работает на всех устройствах и браузерах</div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2025 ImageConvert Pro. Все права защищены.</p>
+            <p>Конвертируйте изображения онлайн бесплатно</p>
+        </footer>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let selectedFormat = null;
+
+        // Элементы DOM
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.querySelector('.upload-area');
+        const formatSelector = document.getElementById('formatSelector');
+        const convertBtn = document.getElementById('convertBtn');
+        const loading = document.getElementById('loading');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Обработка выбора файла
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // Выбор формата
+        formatSelector.addEventListener('click', (e) => {
+            const option = e.target.closest('.format-option');
+            if (option) {
+                document.querySelectorAll('.format-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedFormat = option.dataset.format;
+                updateConvertButton();
+            }
+        });
+
+        // Конвертация
+        convertBtn.addEventListener('click', convertImage);
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите изображение');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер: 10 МБ');
+                return;
+            }
+
+            selectedFile = file;
+            formatSelector.style.display = 'block';
+            
+            // Показываем превью оригинала
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+                downloadBtn.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+
+            updateUploadArea();
+            updateConvertButton();
+        }
+
+        function updateUploadArea() {
+            const uploadText = document.querySelector('.upload-text');
+            const uploadSubtext = document.querySelector('.upload-subtext');
+            
+            uploadText.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${selectedFile.name}`;
+            uploadSubtext.textContent = `Размер: ${(selectedFile.size / 1024 / 1024).toFixed(2)} МБ`;
+        }
+
+        function updateConvertButton() {
+            if (selectedFile && selectedFormat) {
+                convertBtn.style.display = 'block';
+                convertBtn.disabled = false;
+            } else {
+                convertBtn.disabled = true;
+            }
+        }
+
+        function convertImage() {
+            if (!selectedFile || !selectedFormat) return;
+
+            loading.style.display = 'block';
+            convertBtn.disabled = true;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                // Определяем MIME тип и качество
+                let mimeType, quality = 0.9;
+                switch(selectedFormat) {
+                    case 'jpeg':
+                        mimeType = 'image/jpeg';
+                        break;
+                    case 'png':
+                        mimeType = 'image/png';
+                        quality = 1.0;
+                        break;
+                    case 'webp':
+                        mimeType = 'image/webp';
+                        break;
+                }
+
+                // Конвертация
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    previewImage.src = url;
+                    
+                    downloadBtn.href = url;
+                    downloadBtn.download = `converted.${selectedFormat}`;
+                    downloadBtn.style.display = 'inline-block';
+                    
+                    loading.style.display = 'none';
+                    convertBtn.disabled = false;
+                    
+                    // Показываем информацию о результате
+                    const resultInfo = document.createElement('div');
+                    resultInfo.innerHTML = `
+                        <p style="margin: 10px 0; color: #666;">
+                            Исходный размер: ${(selectedFile.size / 1024).toFixed(1)} KB<br>
+                            Новый размер: ${(blob.size / 1024).toFixed(1)} KB<br>
+                            Формат: ${selectedFormat.toUpperCase()}
+                        </p>
+                    `;
+                    
+                    // Удаляем предыдущую информацию если есть
+                    const existingInfo = previewContainer.querySelector('div');
+                    if (existingInfo && existingInfo.innerHTML.includes('Исходный размер')) {
+                        existingInfo.remove();
+                    }
+                    
+                    previewContainer.insertBefore(resultInfo, downloadBtn);
+                    
+                }, mimeType, quality);
+            };
+
+            img.onerror = function() {
+                loading.style.display = 'none';
+                convertBtn.disabled = false;
+                alert('Ошибка при загрузке изображения');
+            };
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        // Счетчик конвертаций для аналитики
+        let conversionCount = 0;
+        convertBtn.addEventListener('click', () => {
+            conversionCount++;
+            // Здесь можно добавить отправку аналитики
+        });
+    </script>
+</body>
+</html>
